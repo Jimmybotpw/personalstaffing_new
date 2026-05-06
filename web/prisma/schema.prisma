@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+}
+
+enum ScheduleStatus {
+  DRAFT
+  GENERATED
+  PUBLISHED
+}
+
+enum AvailabilityType {
+  AVAILABLE
+  UNAVAILABLE
+  PREFERRED
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  passwordHash   String
+  name           String?
+  role           UserRole      @default(OWNER)
+  gymId          String
+  gym            Gym           @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  sessions       Session[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Session {
+  id           String      @id @default(cuid())
+  userId       String
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash    String      @unique
+  expiresAt    DateTime
+  createdAt    DateTime    @default(now())
+}
+
+model Gym {
+  id                String              @id @default(cuid())
+  name              String
+  slug              String              @unique
+  timezone          String              @default("Europe/Berlin")
+  users             User[]
+  employees         Employee[]
+  areas             Area[]
+  courses           Course[]
+  schedules         Schedule[]
+  openingHours      OpeningHour[]
+  constraintConfig  ConstraintConfig?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model Employee {
+  id                String              @id @default(cuid())
+  gymId             String
+  gym               Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  name              String
+  email             String?
+  targetHoursWeek   Int
+  maxHoursWeek      Int
+  weekendService    Boolean             @default(false)
+  openCloseService  Boolean             @default(false)
+  splitService      Boolean             @default(false)
+  qualifications    EmployeeArea[]
+  vacations         Vacation[]
+  fixedTimes        FixedTime[]
+  availability      Availability[]
+  assignments       ScheduleAssignment[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model Area {
+  id                String              @id @default(cuid())
+  gymId             String
+  gym               Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  name              String
+  description       String?
+  minStaffDefault   Int                 @default(1)
+  maxStaffDefault   Int?
+  openingHours      OpeningHour[]
+  employees         EmployeeArea[]
+  shiftTemplates    ShiftTemplate[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model EmployeeArea {
+  employeeId        String
+  areaId            String
+  employee          Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  area              Area                @relation(fields: [areaId], references: [id], onDelete: Cascade)
+
+  @@id([employeeId, areaId])
+}
+
+model Course {
+  id                String              @id @default(cuid())
+  gymId             String
+  gym               Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  name              String
+  primaryEmployeeId String?
+  substitutable     Boolean             @default(false)
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model OpeningHour {
+  id                String              @id @default(cuid())
+  gymId             String
+  gym               Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  areaId            String?
+  area              Area?               @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  weekday           Int
+  startMinutes      Int
+  endMinutes        Int
+}
+
+model FixedTime {
+  id                String              @id @default(cuid())
+  employeeId        String
+  employee          Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  weekday           Int
+  startMinutes      Int
+  endMinutes        Int
+}
+
+model Vacation {
+  id                String              @id @default(cuid())
+  employeeId        String
+  employee          Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  startDate         DateTime
+  endDate           DateTime
+}
+
+model Availability {
+  id                String              @id @default(cuid())
+  employeeId        String
+  employee          Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  weekday           Int
+  startMinutes      Int
+  endMinutes        Int
+  type              AvailabilityType    @default(UNAVAILABLE)
+}
+
+model ConstraintConfig {
+  id                        String      @id @default(cuid())
+  gymId                     String      @unique
+  gym                       Gym         @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  minRestHours              Int         @default(11)
+  planningGridMinutes       Int         @default(30)
+  allowSplitShifts          Boolean     @default(false)
+  maxConsecutiveDays        Int         @default(6)
+  preferBalancedWeekends    Boolean     @default(true)
+  createdAt                 DateTime    @default(now())
+  updatedAt                 DateTime    @updatedAt
+}
+
+model ShiftTemplate {
+  id                String              @id @default(cuid())
+  areaId            String
+  area              Area                @relation(fields: [areaId], references: [id], onDelete: Cascade)
+  weekday           Int
+  startMinutes      Int
+  endMinutes        Int
+  minStaff          Int                 @default(1)
+  maxStaff          Int?
+}
+
+model Schedule {
+  id                String              @id @default(cuid())
+  gymId             String
+  gym               Gym                 @relation(fields: [gymId], references: [id], onDelete: Cascade)
+  startDate         DateTime
+  endDate           DateTime
+  status            ScheduleStatus      @default(DRAFT)
+  notes             String?
+  shifts            ScheduleShift[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+}
+
+model ScheduleShift {
+  id                String              @id @default(cuid())
+  scheduleId        String
+  schedule          Schedule            @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  areaId            String?
+  area              Area?               @relation(fields: [areaId], references: [id], onDelete: SetNull)
+  courseId          String?
+  course            Course?             @relation(fields: [courseId], references: [id], onDelete: SetNull)
+  workDate          DateTime
+  startMinutes      Int
+  endMinutes        Int
+  minStaff          Int                 @default(1)
+  maxStaff          Int?
+  openSlots         Int                 @default(0)
+  assignments       ScheduleAssignment[]
+}
+
+model ScheduleAssignment {
+  id                String              @id @default(cuid())
+  shiftId           String
+  shift             ScheduleShift       @relation(fields: [shiftId], references: [id], onDelete: Cascade)
+  employeeId        String
+  employee          Employee            @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  roleLabel         String?
+  createdAt         DateTime            @default(now())
+}

@@ -1,0 +1,30 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: personalstaffing
+      POSTGRES_USER: personalstaffing
+      POSTGRES_PASSWORD: personalstaffing_dev_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  web:
+    build:
+      context: ./web
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://personalstaffing:personalstaffing_dev_password@db:5432/personalstaffing
+      NODE_ENV: production
+      PORT: 3000
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
