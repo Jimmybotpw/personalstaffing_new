@@ -256,6 +256,15 @@ th {
   padding: 18px;
 }
 
+.auth-form {
+  margin-top: 20px;
+}
+
+.error-text {
+  color: #a12828;
+  margin: 0;
+}
+
 @media (max-width: 900px) {
   .grid,
   .stats-grid,
