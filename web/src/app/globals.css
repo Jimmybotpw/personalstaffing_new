@@ -17,6 +17,10 @@ body {
 }
 
 a { color: inherit; }
+input,
+button {
+  font: inherit;
+}
 
 .page,
 .auth-page {
@@ -107,6 +111,27 @@ h2 {
   gap: 18px;
 }
 
+.stack.two-column {
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.stat-card strong {
+  font-size: 2rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-card span {
+  color: var(--muted);
+}
+
 .row-card,
 .area-card,
 .section-head-row,
@@ -195,8 +220,46 @@ th {
   padding-bottom: 12px;
 }
 
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.form-grid label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.form-grid input {
+  min-height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  padding: 0 14px;
+  background: #fff;
+  color: var(--text);
+}
+
+.checkbox-row {
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-row input {
+  min-height: auto;
+}
+
+.area-card-inline {
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+}
+
 @media (max-width: 900px) {
-  .grid { grid-template-columns: 1fr; }
+  .grid,
+  .stats-grid,
+  .stack.two-column { grid-template-columns: 1fr; }
   h1 { max-width: none; }
   .section-head-row,
   .area-card,

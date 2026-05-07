@@ -1,11 +1,15 @@
 import { AppNav } from "@/components/nav";
 import { getCurrentUser } from "@/lib/auth";
-import { demoEmployees } from "@/lib/demo-data";
+import { ensureDemoGym, getEmployeesForGym } from "@/lib/repositories";
 import { redirect } from "next/navigation";
+import { createEmployeeAction } from "./actions";
 
 export default async function EmployeesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
+
+  const gym = await ensureDemoGym();
+  const employees = await getEmployeesForGym(gym.id);
 
   return (
     <main className="page">
@@ -14,19 +18,18 @@ export default async function EmployeesPage() {
         <p className="eyebrow">Employees</p>
         <h1>Team setup</h1>
         <p className="lead">
-          This is the first real management screen direction for the rebuild: employee master data,
-          target hours, and operational flags.
+          Employee master data is now wired to the database. This is the first real persistence layer
+          for the rebuild.
         </p>
       </section>
 
-      <section className="stack">
+      <section className="stack two-column">
         <article className="card">
           <div className="section-head-row">
             <div>
               <h2>Current team</h2>
-              <p>Demo data for the first product flow.</p>
+              <p>{employees.length} employee records stored for {gym.name}.</p>
             </div>
-            <button className="button-primary" type="button">Add employee</button>
           </div>
           <div className="table-wrap">
             <table>
@@ -40,7 +43,7 @@ export default async function EmployeesPage() {
                 </tr>
               </thead>
               <tbody>
-                {demoEmployees.map((employee) => (
+                {employees.map((employee: Awaited<ReturnType<typeof getEmployeesForGym>>[number]) => (
                   <tr key={employee.id}>
                     <td>{employee.name}</td>
                     <td>{employee.targetHoursWeek}h</td>
@@ -55,12 +58,30 @@ export default async function EmployeesPage() {
         </article>
 
         <article className="card form-card">
-          <h2>What this page will become</h2>
-          <ul className="feature-list">
-            <li>Create and edit employees</li>
-            <li>Store hours, qualifications, vacations, and availability</li>
-            <li>Prepare clean scheduling input for the solver</li>
-          </ul>
+          <h2>Add employee</h2>
+          <form action={createEmployeeAction} className="form-grid">
+            <label>
+              <span>Name</span>
+              <input name="name" type="text" placeholder="Jane Doe" required />
+            </label>
+            <label>
+              <span>Target hours / week</span>
+              <input name="targetHoursWeek" type="number" min="1" defaultValue="20" required />
+            </label>
+            <label>
+              <span>Max hours / week</span>
+              <input name="maxHoursWeek" type="number" min="1" defaultValue="24" required />
+            </label>
+            <label className="checkbox-row">
+              <input name="weekendService" type="checkbox" />
+              <span>Available for weekend service</span>
+            </label>
+            <label className="checkbox-row">
+              <input name="openCloseService" type="checkbox" />
+              <span>Can work opening and closing shifts</span>
+            </label>
+            <button className="button-primary" type="submit">Save employee</button>
+          </form>
         </article>
       </section>
     </main>
