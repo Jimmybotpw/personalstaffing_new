@@ -45,6 +45,43 @@ export async function getEmployeesWithQualificationsForGym(gymId: string) {
   });
 }
 
+export async function getPlannerDatasetForGym(gymId: string) {
+  return prisma.gym.findUniqueOrThrow({
+    where: { id: gymId },
+    include: {
+      constraintConfig: true,
+      courses: {
+        orderBy: { name: "asc" },
+      },
+      areas: {
+        include: {
+          openingHours: {
+            orderBy: [{ weekday: "asc" }, { startMinutes: "asc" }],
+          },
+        },
+        orderBy: { name: "asc" },
+      },
+      employees: {
+        include: {
+          qualifications: {
+            orderBy: { areaId: "asc" },
+          },
+          vacations: {
+            orderBy: { startDate: "asc" },
+          },
+          fixedTimes: {
+            orderBy: [{ weekday: "asc" }, { startMinutes: "asc" }],
+          },
+          availability: {
+            orderBy: [{ weekday: "asc" }, { startMinutes: "asc" }],
+          },
+        },
+        orderBy: { name: "asc" },
+      },
+    },
+  });
+}
+
 export async function ensureDemoGym() {
   const existing = await prisma.gym.findUnique({
     where: { slug: "demo-gym" },

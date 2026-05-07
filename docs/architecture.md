@@ -54,3 +54,10 @@ Replace:
 4. Port scheduling engine deliberately
 5. Add generation + review UI
 6. Dockerize and deploy
+
+## Planner direction
+The scheduling engine should stay in the **OR-Tools CP-SAT** family, but be rebuilt with a cleaner architecture than the old prototype.
+
+See:
+- `docs/planner-rules.md`
+- `docs/planner-architecture.md`
