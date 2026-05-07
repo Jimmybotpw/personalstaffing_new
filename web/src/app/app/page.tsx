@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
+import { AppNav } from "@/components/nav";
 
 const sections = [
   "Workspace setup",
@@ -15,12 +16,13 @@ export default async function AppDashboardPage() {
 
   return (
     <main className="page">
+      <AppNav />
       <section className="hero compact">
         <p className="eyebrow">Authenticated demo area</p>
         <h1>{user.gymName}</h1>
         <p className="lead">
-          This protected area is the starting point for the real planner. Next steps are
-          CRUD flows, constraints, and schedule generation.
+          The rebuild now has first concrete management screens. Next steps are real persistence,
+          validation, and the actual scheduler integration.
         </p>
       </section>
 
@@ -30,7 +32,7 @@ export default async function AppDashboardPage() {
             <strong>{String(index + 1).padStart(2, "0")}</strong>
             <div>
               <h2>{item}</h2>
-              <p>Planned as part of the rebuild sequence.</p>
+              <p>Now being turned into actual product modules instead of placeholder-only setup.</p>
             </div>
           </article>
         ))}

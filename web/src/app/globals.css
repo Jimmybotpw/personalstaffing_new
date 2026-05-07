@@ -22,7 +22,7 @@ a { color: inherit; }
 .auth-page {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 48px 20px 72px;
+  padding: 32px 20px 72px;
 }
 
 .auth-page {
@@ -45,7 +45,7 @@ a { color: inherit; }
 }
 
 .hero {
-  padding: 48px 0 32px;
+  padding: 30px 0 24px;
 }
 
 .hero.compact {
@@ -78,20 +78,48 @@ h2 {
   font-size: 1.05rem;
 }
 
+.app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.nav-link {
+  text-decoration: none;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.75);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 
-.grid.single-column {
+.grid.single-column,
+.stack {
+  display: grid;
   grid-template-columns: 1fr;
+  gap: 18px;
 }
 
-.row-card {
+.row-card,
+.area-card,
+.section-head-row,
+.kv-row {
   display: flex;
-  align-items: flex-start;
   gap: 16px;
+}
+
+.row-card,
+.area-card,
+.kv-row {
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .row-card strong {
@@ -105,20 +133,72 @@ h2 {
   flex: 0 0 auto;
 }
 
-.button-primary {
+.button-primary,
+.button-secondary {
   appearance: none;
-  border: 0;
   border-radius: 999px;
   min-height: 46px;
   padding: 0 18px;
-  background: var(--accent);
-  color: white;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
 }
 
+.button-primary {
+  border: 0;
+  background: var(--accent);
+  color: white;
+}
+
+.button-secondary {
+  border: 1px solid var(--line);
+  background: white;
+  color: var(--text);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 14px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+th {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.feature-list {
+  color: var(--muted);
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.8;
+}
+
+.kv-list {
+  display: grid;
+  gap: 12px;
+}
+
+.kv-row {
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 12px;
+}
+
 @media (max-width: 900px) {
   .grid { grid-template-columns: 1fr; }
   h1 { max-width: none; }
+  .section-head-row,
+  .area-card,
+  .kv-row { flex-direction: column; align-items: flex-start; }
 }
