@@ -18,7 +18,8 @@ body {
 
 a { color: inherit; }
 input,
-button {
+button,
+select {
   font: inherit;
 }
 
@@ -231,7 +232,9 @@ th {
   color: var(--muted);
 }
 
-.form-grid input {
+.form-grid input,
+.form-grid select,
+.inline-form select {
   min-height: 46px;
   border-radius: 14px;
   border: 1px solid var(--line);
@@ -256,6 +259,32 @@ th {
   padding: 18px;
 }
 
+.constraint-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+.qualification-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.qualification-card {
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.inline-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .auth-form {
   margin-top: 20px;
 }
@@ -268,9 +297,12 @@ th {
 @media (max-width: 900px) {
   .grid,
   .stats-grid,
-  .stack.two-column { grid-template-columns: 1fr; }
+  .stack.two-column,
+  .constraint-grid { grid-template-columns: 1fr; }
   h1 { max-width: none; }
   .section-head-row,
   .area-card,
-  .kv-row { flex-direction: column; align-items: flex-start; }
+  .kv-row,
+  .qualification-card,
+  .inline-form { flex-direction: column; align-items: flex-start; }
 }

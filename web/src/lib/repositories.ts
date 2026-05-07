@@ -19,6 +19,32 @@ export async function getAreasForGym(gymId: string) {
   });
 }
 
+export async function getConstraintConfigForGym(gymId: string) {
+  return prisma.constraintConfig.findUnique({ where: { gymId } });
+}
+
+export async function getOpeningHoursForGym(gymId: string) {
+  return prisma.openingHour.findMany({
+    where: { gymId },
+    include: { area: true },
+    orderBy: [{ weekday: "asc" }, { startMinutes: "asc" }],
+  });
+}
+
+export async function getEmployeesWithQualificationsForGym(gymId: string) {
+  return prisma.employee.findMany({
+    where: { gymId },
+    include: {
+      qualifications: {
+        include: {
+          area: true,
+        },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+}
+
 export async function ensureDemoGym() {
   const existing = await prisma.gym.findUnique({
     where: { slug: "demo-gym" },
@@ -71,9 +97,22 @@ export async function ensureDemoGym() {
           },
         ],
       },
+      openingHours: {
+        create: [
+          { weekday: 1, startMinutes: 480, endMinutes: 1320 },
+          { weekday: 2, startMinutes: 480, endMinutes: 1320 },
+          { weekday: 3, startMinutes: 480, endMinutes: 1320 },
+          { weekday: 4, startMinutes: 480, endMinutes: 1320 },
+          { weekday: 5, startMinutes: 480, endMinutes: 1260 },
+          { weekday: 6, startMinutes: 540, endMinutes: 1080 },
+        ],
+      },
       constraintConfig: {
         create: {},
       },
+    },
+    include: {
+      users: true,
     },
   });
 }
