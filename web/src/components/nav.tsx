@@ -5,6 +5,7 @@ const links = [
   { href: "/app/employees", label: "Employees" },
   { href: "/app/areas", label: "Areas" },
   { href: "/app/constraints", label: "Constraints" },
+  { href: "/app/schedules", label: "Schedules" },
 ];
 
 export function AppNav() {

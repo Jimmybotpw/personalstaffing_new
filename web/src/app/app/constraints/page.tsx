@@ -11,6 +11,7 @@ import { redirect } from "next/navigation";
 import {
   assignEmployeeAreaAction,
   createOpeningHourAction,
+  generateScheduleFromConstraintsAction,
   saveConstraintConfigAction,
 } from "./actions";
 
@@ -78,6 +79,26 @@ export default async function ConstraintsPage() {
               <span>Prefer balanced weekends</span>
             </label>
             <button className="button-primary" type="submit">Save rules</button>
+          </form>
+        </article>
+
+        <article className="card">
+          <div className="section-head-row">
+            <div>
+              <h2>Generate schedule</h2>
+              <p>Runs the CP-SAT planner and saves a generated draft schedule.</p>
+            </div>
+          </div>
+          <form action={generateScheduleFromConstraintsAction} className="form-grid constraint-grid">
+            <label>
+              <span>Start date</span>
+              <input name="startDate" type="date" defaultValue="2026-05-11" required />
+            </label>
+            <label>
+              <span>End date</span>
+              <input name="endDate" type="date" defaultValue="2026-05-17" required />
+            </label>
+            <button className="button-primary" type="submit">Generate and save draft</button>
           </form>
         </article>
 

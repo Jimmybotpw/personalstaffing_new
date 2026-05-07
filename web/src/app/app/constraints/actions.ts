@@ -1,8 +1,10 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { ensureDemoGym } from "@/lib/repositories";
 import { revalidatePath } from "next/cache";
+import { generateScheduleAction } from "@/app/app/schedules/actions";
 
 export async function saveConstraintConfigAction(formData: FormData) {
   const gym = await ensureDemoGym();
@@ -74,4 +76,9 @@ export async function assignEmployeeAreaAction(formData: FormData) {
   });
 
   revalidatePath("/app/constraints");
+}
+
+export async function generateScheduleFromConstraintsAction(formData: FormData) {
+  await generateScheduleAction(formData);
+  redirect("/app/schedules");
 }
