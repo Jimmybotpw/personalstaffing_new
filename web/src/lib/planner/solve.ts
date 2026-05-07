@@ -76,6 +76,20 @@ type EmployeeAssignedBlock = {
   endMinutes: number;
 };
 
+function blockFitsPreferredWindow(employee: PlannerEmployee, block: SolverDemandBlock) {
+  const preferredWindows = employee.availability.filter((entry) => entry.type === "PREFERRED");
+  if (preferredWindows.length === 0) {
+    return false;
+  }
+
+  return preferredWindows.some(
+    (window) =>
+      window.weekday === block.weekday &&
+      block.startMinutes >= window.startMinutes &&
+      block.endMinutes <= window.endMinutes,
+  );
+}
+
 function mapEmployee(employee: PlannerEmployee): SolverEmployee {
   return {
     id: employee.id,
@@ -171,6 +185,7 @@ export function runBasicAssignment(
 ): SolverRunResult {
   const eligibility = buildBlockEligibility(plannerInput, solverInput);
   const employeeById = new Map(solverInput.employees.map((employee) => [employee.id, employee]));
+  const plannerEmployeeById = new Map(plannerInput.employees.map((employee) => [employee.id, employee]));
   const minutesByEmployeeId = new Map<string, number>();
   const assignedBlocksByEmployeeId = new Map<string, EmployeeAssignedBlock[]>();
   const assignments: SolverAssignment[] = [];
@@ -183,8 +198,22 @@ export function runBasicAssignment(
 
     const assignedForBlock: string[] = [];
     const sortedCandidates = [...eligibleEmployeeIds].sort((leftId, rightId) => {
+      const leftSolverEmployee = employeeById.get(leftId);
+      const rightSolverEmployee = employeeById.get(rightId);
+      const leftPlannerEmployee = plannerEmployeeById.get(leftId);
+      const rightPlannerEmployee = plannerEmployeeById.get(rightId);
+
       const leftMinutes = minutesByEmployeeId.get(leftId) ?? 0;
       const rightMinutes = minutesByEmployeeId.get(rightId) ?? 0;
+
+      const leftTargetGap = (leftSolverEmployee?.targetMinutesWeek ?? 0) - leftMinutes;
+      const rightTargetGap = (rightSolverEmployee?.targetMinutesWeek ?? 0) - rightMinutes;
+      if (leftTargetGap !== rightTargetGap) return rightTargetGap - leftTargetGap;
+
+      const leftPreferred = leftPlannerEmployee ? blockFitsPreferredWindow(leftPlannerEmployee, block) : false;
+      const rightPreferred = rightPlannerEmployee ? blockFitsPreferredWindow(rightPlannerEmployee, block) : false;
+      if (leftPreferred !== rightPreferred) return leftPreferred ? -1 : 1;
+
       if (leftMinutes !== rightMinutes) return leftMinutes - rightMinutes;
       return leftId.localeCompare(rightId);
     });
