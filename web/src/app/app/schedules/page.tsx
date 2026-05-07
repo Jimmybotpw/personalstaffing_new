@@ -12,6 +12,20 @@ function formatMinutes(value: number) {
   return `${hours}:${minutes}`;
 }
 
+function summarizeSchedule(schedule: {
+  shifts: Array<{ openSlots: number; assignments: Array<unknown> }>;
+}) {
+  return schedule.shifts.reduce(
+    (summary, shift) => {
+      summary.assignmentCount += shift.assignments.length;
+      summary.openSlotCount += shift.openSlots;
+      if (shift.openSlots > 0) summary.openShiftCount += 1;
+      return summary;
+    },
+    { assignmentCount: 0, openSlotCount: 0, openShiftCount: 0 },
+  );
+}
+
 export default async function SchedulesPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
@@ -54,7 +68,10 @@ export default async function SchedulesPage() {
             <p>Generate one from the constraints page to create the first draft.</p>
           </article>
         ) : (
-          schedules.map((schedule) => (
+          schedules.map((schedule) => {
+            const summary = summarizeSchedule(schedule);
+
+            return (
             <article key={schedule.id} className="card">
               <div className="section-head-row">
                 <div>
@@ -65,6 +82,20 @@ export default async function SchedulesPage() {
                     Status: {schedule.status} · {schedule.shifts.length} shifts · {schedule.notes ?? "Generated draft"}
                   </p>
                 </div>
+              </div>
+              <div className="stats-grid compact-stats">
+                <article className="card stat-card">
+                  <strong>{summary.assignmentCount}</strong>
+                  <span>Assignments</span>
+                </article>
+                <article className="card stat-card">
+                  <strong>{summary.openShiftCount}</strong>
+                  <span>Open shifts</span>
+                </article>
+                <article className="card stat-card">
+                  <strong>{summary.openSlotCount}</strong>
+                  <span>Open slots</span>
+                </article>
               </div>
               <div className="table-wrap">
                 <table>
@@ -97,7 +128,7 @@ export default async function SchedulesPage() {
                 </table>
               </div>
             </article>
-          ))
+          );})
         )}
       </section>
     </main>
