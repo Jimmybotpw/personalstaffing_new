@@ -3,7 +3,23 @@ import { AppNav } from "@/components/nav";
 import { getCurrentUser } from "@/lib/auth";
 import { ensureDemoGym, getAreasForGym, getEmployeesForGym } from "@/lib/repositories";
 import { prisma } from "@/lib/prisma";
+import type { Prisma } from "@prisma/client";
 import { importExampleDatasetAction } from "./import-actions";
+
+type ScheduleListItem = Prisma.ScheduleGetPayload<{
+  include: {
+    shifts: {
+      include: {
+        area: true;
+        assignments: {
+          include: {
+            employee: true;
+          };
+        };
+      };
+    };
+  };
+}>;
 
 function formatMinutes(value: number) {
   const hours = Math.floor(value / 60)
@@ -102,7 +118,7 @@ export default async function SchedulesPage() {
             <p>Generate one from the constraints page to create the first draft.</p>
           </article>
         ) : (
-          schedules.map((schedule) => {
+          schedules.map((schedule: ScheduleListItem) => {
             const summary = summarizeSchedule(schedule);
 
             return (
@@ -146,7 +162,7 @@ export default async function SchedulesPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {schedule.shifts.map((shift) => (
+                      {schedule.shifts.map((shift: ScheduleListItem["shifts"][number]) => (
                         <tr key={shift.id}>
                           <td>{shift.workDate.toISOString().slice(0, 10)}</td>
                           <td>{shift.area?.name ?? "Unknown area"}</td>
@@ -155,7 +171,9 @@ export default async function SchedulesPage() {
                           </td>
                           <td>
                             {shift.assignments.length > 0
-                              ? shift.assignments.map((assignment) => assignment.employee.name).join(", ")
+                              ? shift.assignments
+                                  .map((assignment: ScheduleListItem["shifts"][number]["assignments"][number]) => assignment.employee.name)
+                                  .join(", ")
                               : "—"}
                           </td>
                           <td>{shift.openSlots}</td>
