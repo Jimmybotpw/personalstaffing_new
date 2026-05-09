@@ -121,7 +121,7 @@ export default async function ConstraintsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {openingHours.map((slot) => (
+                  {openingHours.map((slot: Awaited<ReturnType<typeof getOpeningHoursForGym>>[number]) => (
                     <tr key={slot.id}>
                       <td>{weekdayLabels[slot.weekday - 1] ?? `Day ${slot.weekday}`}</td>
                       <td>{slot.area?.name ?? "Gym-wide"}</td>
@@ -151,7 +151,7 @@ export default async function ConstraintsPage() {
                 <span>Area</span>
                 <select name="areaId" defaultValue="">
                   <option value="">Gym-wide</option>
-                  {areas.map((area) => (
+                  {areas.map((area: Awaited<ReturnType<typeof getAreasForGym>>[number]) => (
                     <option key={area.id} value={area.id}>
                       {area.name}
                     </option>
@@ -179,7 +179,7 @@ export default async function ConstraintsPage() {
             </div>
           </div>
           <div className="qualification-grid">
-            {employees.map((employee) => (
+            {employees.map((employee: Awaited<ReturnType<typeof getEmployeesWithQualificationsForGym>>[number]) => (
               <article key={employee.id} className="qualification-card">
                 <div>
                   <h2>{employee.name}</h2>
@@ -195,7 +195,7 @@ export default async function ConstraintsPage() {
                     <option value="" disabled>
                       Assign area…
                     </option>
-                    {areas.map((area) => (
+                    {areas.map((area: Awaited<ReturnType<typeof getAreasForGym>>[number]) => (
                       <option key={area.id} value={area.id}>
                         {area.name}
                       </option>
