@@ -9,6 +9,7 @@ RUN apk add --no-cache python3 py3-pip
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN pip3 install --break-system-packages -r python/requirements.txt
+RUN npx prisma generate
 RUN npm run build
 
 FROM node:22-alpine AS runner
