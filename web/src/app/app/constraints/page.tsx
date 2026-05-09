@@ -185,7 +185,9 @@ export default async function ConstraintsPage() {
                   <h2>{employee.name}</h2>
                   <p>
                     Current areas: {employee.qualifications.length > 0
-                      ? employee.qualifications.map((entry) => entry.area.name).join(", ")
+                      ? employee.qualifications
+                          .map((entry: Awaited<ReturnType<typeof getEmployeesWithQualificationsForGym>>[number]["qualifications"][number]) => entry.area.name)
+                          .join(", ")
                       : "None assigned yet"}
                   </p>
                 </div>
