@@ -18,4 +18,4 @@ ENV NODE_ENV=production
 COPY --from=builder /app .
 RUN pip3 install --break-system-packages -r python/requirements.txt
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node", "scripts/start-with-db.mjs"]
